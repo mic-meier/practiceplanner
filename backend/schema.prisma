@@ -1,0 +1,28 @@
+datasource postgresql {
+  url      = env("DATABASE_URL")
+  provider = "postgresql"
+}
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "node_modules/.prisma/client"
+}
+
+model User {
+  id       String  @id @default(cuid())
+  name     String?
+  email    String? @unique
+  password String?
+  role     Role?   @relation("User_role", fields: [roleId], references: [id])
+  roleId   String? @map("role")
+
+  @@index([roleId])
+}
+
+model Role {
+  id               String   @id @default(cuid())
+  name             String?
+  canManageContent Boolean?
+  canManageUsers   Boolean?
+  users            User[]   @relation("User_role")
+}

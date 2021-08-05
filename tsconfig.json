@@ -19,12 +19,8 @@
     "isolatedModules": true,
     "jsx": "preserve",
     "paths": {
-      "@frontend/*": [
-        "frontend/*"
-      ],
-      "@backend": [
-        "backend/*"
-      ]
+      "@frontend/*": ["frontend/*"],
+      "@backend/*": ["backend/*"]
     }
   },
   "include": [

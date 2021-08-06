@@ -1,4 +1,4 @@
-import { useAuth } from '@frontend/lib/auth'
+import { useAuth } from '@frontend/components/auth'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 

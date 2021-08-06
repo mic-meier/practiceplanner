@@ -1,6 +1,6 @@
 import '../styles/globals.css'
 
-import { AuthProvider } from '@frontend//lib/auth'
+import { AuthProvider } from '@frontend/components/auth'
 import { AppProps } from 'next/app'
 import { QueryClient, QueryClientProvider } from 'react-query'
 import { ReactQueryDevtools } from 'react-query/devtools'

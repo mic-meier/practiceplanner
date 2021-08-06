@@ -1,4 +1,4 @@
-import { useAuth } from '@frontend/lib/auth'
+import { useAuth } from '@frontend/components/auth'
 import Link from 'next/link'
 
 const Home = () => {

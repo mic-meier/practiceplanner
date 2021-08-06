@@ -47,7 +47,8 @@ export default auth.withAuth(
     }),
     lists,
     server: {
-      cors: { origin: ['http://localhost:3001'], credentials: true },
+      port: 3001,
+      cors: { origin: ['http://localhost:3000'], credentials: true },
     },
   })
 )

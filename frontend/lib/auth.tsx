@@ -1,6 +1,6 @@
-import { gql, request } from 'graphql-request'
+import { gql, GraphQLClient } from 'graphql-request'
 import { createContext, ReactNode, useContext, useEffect, useRef } from 'react'
-import { useMutation, useQuery } from 'react-query'
+import { useMutation, useQuery, useQueryClient } from 'react-query'
 
 /*
 From https://github.com/keystonejs/prisma-day-2021-workshop/blob/main/components/auth.tsx
@@ -32,16 +32,21 @@ export const useAuth = () => {
 }
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
+  const queryClient = useQueryClient()
   const wasReady = useRef(false)
-  const endpoint = process.env.API_URL || 'http://localhost:3000/api/graphql'
+
+  const graphQLClient = new GraphQLClient(
+    typeof window === undefined
+      ? 'http://localhost:8001/api/graphql'
+      : '/api/graphql'
+  )
 
   const {
     data: sessionData,
     isLoading,
     error: sessionError,
-  } = useQuery('authenticated-user', async () => {
-    const data = await request(
-      endpoint,
+  } = useQuery('user', async () => {
+    const data = await graphQLClient.request(
       gql`
         query {
           authenticatedItem {
@@ -53,14 +58,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         }
       `
     )
-    console.log('Data from authenticated-user request: ', data)
     return data
   })
 
   const { mutateAsync: authenticate } = useMutation(
     async ({ email, password }: SignInArgs) => {
-      const data = await request(
-        endpoint,
+      const data = await graphQLClient.request(
         gql`
           mutation ($email: String!, $password: String!) {
             authenticateUserWithPassword(email: $email, password: $password) {
@@ -79,6 +82,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         { email, password }
       )
       return data
+    },
+    {
+      onSuccess: () => {
+        queryClient.invalidateQueries('user')
+      },
     }
   )
 
@@ -105,16 +113,22 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     return { success: false, message: 'An unknown error occurred' }
   }
 
-  const { mutate: signOutMutation } = useMutation(async () => {
-    await request(
-      endpoint,
-      gql`
-        mutation {
-          endSession
-        }
-      `
-    )
-  })
+  const { mutate: signOutMutation } = useMutation(
+    async () => {
+      await graphQLClient.request(
+        gql`
+          mutation {
+            endSession
+          }
+        `
+      )
+    },
+    {
+      onSuccess: () => {
+        queryClient.invalidateQueries('user')
+      },
+    }
+  )
 
   const signOut = () => {
     signOutMutation()

@@ -6,7 +6,7 @@ const SignInPage = () => {
   const auth = useAuth()
   const [email, setEmail] = useState('admin@demo.com')
   const [password, setPassword] = useState('password')
-  const [error, setError] = useState('')
+  const [, setError] = useState('')
   const router = useRouter()
 
   const signIn = async () => {
@@ -20,7 +20,6 @@ const SignInPage = () => {
     }
     setError('')
     const result = await auth.signIn({ email, password })
-    console.log(result)
     if (result.success) {
       router.push('/')
     } else {

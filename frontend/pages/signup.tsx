@@ -1,15 +1,18 @@
+import { Button } from '@frontend/components/ui/controls'
+import {
+  FieldContainer,
+  FieldLabel,
+  TextInput,
+} from '@frontend/components/ui/forms'
+import { Container } from '@frontend/components/ui/layout'
+import { Formik } from 'formik'
 import { gql, request } from 'graphql-request'
 import { useRouter } from 'next/router'
-import { useState } from 'react'
 import { useMutation, useQueryClient } from 'react-query'
 
 export type SignUpArgs = { name: string; email: string; password: string }
 
 const SignupPage = () => {
-  const [name, setName] = useState('')
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-
   const queryClient = useQueryClient()
   const router = useRouter()
 
@@ -39,56 +42,82 @@ const SignupPage = () => {
     {
       onSuccess: () => {
         queryClient.invalidateQueries('user')
+        router.push('/')
       },
     }
   )
 
   return (
-    <div>
-      <h1>Sign Up</h1>
-      <form
-        onSubmit={(event) => {
-          event.preventDefault()
-          signup({ name, email, password })
-          router.push('/')
+    <Container>
+      <h1>Sign In</h1>
+      <Formik
+        initialValues={{ name: '', email: '', password: '' }}
+        onSubmit={(values, { setSubmitting }) => {
+          setSubmitting(false)
+          signup(values)
         }}
       >
-        <div>
-          <label htmlFor="name">Name</label>
-          <input
-            type="text"
-            name="name"
-            value={name}
-            onChange={(event) => {
-              setName(event.target.value)
-            }}
-          />
-        </div>
-        <div>
-          <label htmlFor="email">Email</label>
-          <input
-            type="text"
-            name="email"
-            value={email}
-            onChange={(event) => {
-              setEmail(event.target.value)
-            }}
-          />
-        </div>
-        <div>
-          <label htmlFor="name">Password</label>
-          <input
-            type="password"
-            name="password"
-            value={password}
-            onChange={(event) => {
-              setPassword(event.target.value)
-            }}
-          />
-        </div>
-        <button type="submit">Sign Up</button>
-      </form>
-    </div>
+        {({
+          values,
+          errors,
+          touched,
+          handleChange,
+          handleBlur,
+          handleSubmit,
+          isSubmitting,
+        }) => (
+          <form onSubmit={handleSubmit}>
+            <FieldContainer htmlFor="name">
+              <FieldLabel>Email</FieldLabel>
+              <TextInput
+                type="text"
+                name="name"
+                size="large"
+                id="name"
+                onChange={handleChange}
+                onBlur={handleBlur}
+                value={values.name}
+              />
+              {errors.email && touched.email && errors.email}
+            </FieldContainer>
+            <FieldContainer htmlFor="email">
+              <FieldLabel>Email</FieldLabel>
+              <TextInput
+                type="email"
+                name="email"
+                size="large"
+                id="email"
+                onChange={handleChange}
+                onBlur={handleBlur}
+                value={values.email}
+              />
+              {errors.email && touched.email && errors.email}
+            </FieldContainer>
+            <FieldContainer htmlFor="password">
+              <FieldLabel>Password</FieldLabel>
+              <TextInput
+                type="password"
+                name="password"
+                id="password"
+                size="large"
+                onChange={handleChange}
+                onBlur={handleBlur}
+                value={values.password}
+              />
+              {errors.password && touched.password && errors.password}
+            </FieldContainer>
+            <Button
+              type="submit"
+              disabled={isSubmitting}
+              appearance="primary"
+              size="large"
+            >
+              Sign in{' '}
+            </Button>
+          </form>
+        )}
+      </Formik>
+    </Container>
   )
 }
 

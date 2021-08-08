@@ -1,76 +1,90 @@
-import { useAuth } from '@frontend/components/auth'
+import { SignInArgs, useAuth } from '@frontend/components/auth'
+import { Button } from '@frontend/components/ui/controls'
+import {
+  FieldContainer,
+  FieldLabel,
+  TextInput,
+} from '@frontend/components/ui/forms'
+import { Container } from '@frontend/components/ui/layout'
+import { Formik } from 'formik'
+import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { useState } from 'react'
 
 const SignInPage = () => {
   const auth = useAuth()
-  const [email, setEmail] = useState('admin@demo.com')
-  const [password, setPassword] = useState('password')
-  const [, setError] = useState('')
   const router = useRouter()
 
-  const signIn = async () => {
+  const signIn = async ({ email, password }: SignInArgs) => {
     if (!auth.ready) {
-      setError('Auth is not ready, try again in a moment.')
-      return
+      return <div>Loading...</div>
     }
-    if (!email.length || !password.length) {
-      setError('Please enter a username and password.')
-      return
-    }
-    setError('')
     const result = await auth.signIn({ email, password })
     if (result.success) {
       router.push('/')
-    } else {
-      setEmail('')
-      setPassword('')
-      setError(result.message)
     }
-  }
-
-  const signOut = () => {
-    if (!auth.ready) {
-      setError('Auth is not ready, try again in a moment.')
-      return
-    }
-    auth.signOut()
-    router.push('/')
   }
 
   return (
-    <div>
-      <div>Sign In</div>
-      <form
-        onSubmit={(e) => {
-          e.preventDefault()
-          signIn()
+    <Container>
+      <h1>Sign In</h1>
+      <Formik
+        initialValues={{ email: '', password: '' }}
+        onSubmit={(values, { setSubmitting }) => {
+          signIn(values)
+          setSubmitting(false)
         }}
       >
-        <div>
-          <input
-            type="text"
-            name="email"
-            value={email}
-            onChange={(event) => {
-              setEmail(event.target.value)
-            }}
-          />
-        </div>
-        <div>
-          <input
-            type="password"
-            name="password"
-            value={password}
-            onChange={(event) => {
-              setPassword(event.target.value)
-            }}
-          />
-        </div>
-        <button type="submit">Sign in </button>
-      </form>
-      <button onClick={() => signOut()}>Sign out</button>
-    </div>
+        {({
+          values,
+          errors,
+          touched,
+          handleChange,
+          handleBlur,
+          handleSubmit,
+          isSubmitting,
+        }) => (
+          <form onSubmit={handleSubmit}>
+            <FieldContainer htmlFor="email">
+              <FieldLabel>Email</FieldLabel>
+              <TextInput
+                type="email"
+                name="email"
+                size="large"
+                id="email"
+                onChange={handleChange}
+                onBlur={handleBlur}
+                value={values.email}
+              />
+              {errors.email && touched.email && errors.email}
+            </FieldContainer>
+            <FieldContainer htmlFor="password">
+              <FieldLabel>Password</FieldLabel>
+              <TextInput
+                type="password"
+                name="password"
+                id="password"
+                size="large"
+                onChange={handleChange}
+                onBlur={handleBlur}
+                value={values.password}
+              />
+              {errors.password && touched.password && errors.password}
+            </FieldContainer>
+            <Button
+              type="submit"
+              disabled={isSubmitting}
+              appearance="primary"
+              size="large"
+            >
+              Sign in{' '}
+            </Button>
+          </form>
+        )}
+      </Formik>
+      <div className="my-4">
+        <Link href="/signup">Want to join instead?</Link>
+      </div>
+    </Container>
   )
 }
 

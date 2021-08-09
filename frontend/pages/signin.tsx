@@ -1,12 +1,8 @@
 import { SignInArgs, useAuth } from '@frontend/components/auth'
 import { Button } from '@frontend/components/ui/controls'
-import {
-  FieldContainer,
-  FieldLabel,
-  TextInput,
-} from '@frontend/components/ui/forms'
+import { FieldContainer, TextInput } from '@frontend/components/ui/forms'
 import { Container } from '@frontend/components/ui/layout'
-import { Formik } from 'formik'
+import { Form, Formik } from 'formik'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 
@@ -19,6 +15,7 @@ const SignInPage = () => {
       return <div>Loading...</div>
     }
     const result = await auth.signIn({ email, password })
+    console.log(result)
     if (result.success) {
       router.push('/')
     }
@@ -30,55 +27,42 @@ const SignInPage = () => {
       <Formik
         initialValues={{ email: '', password: '' }}
         onSubmit={(values, { setSubmitting }) => {
+          console.log(values)
           signIn(values)
           setSubmitting(false)
         }}
       >
-        {({
-          values,
-          errors,
-          touched,
-          handleChange,
-          handleBlur,
-          handleSubmit,
-          isSubmitting,
-        }) => (
-          <form onSubmit={handleSubmit}>
-            <FieldContainer htmlFor="email">
-              <FieldLabel>Email</FieldLabel>
+        {({ isSubmitting }) => (
+          <Form>
+            <FieldContainer>
               <TextInput
+                size="large"
+                label="Email"
                 type="email"
                 name="email"
-                size="large"
                 id="email"
-                onChange={handleChange}
-                onBlur={handleBlur}
-                value={values.email}
               />
-              {errors.email && touched.email && errors.email}
             </FieldContainer>
-            <FieldContainer htmlFor="password">
-              <FieldLabel>Password</FieldLabel>
+            <FieldContainer>
               <TextInput
+                size="large"
+                label="Password"
                 type="password"
                 name="password"
                 id="password"
-                size="large"
-                onChange={handleChange}
-                onBlur={handleBlur}
-                value={values.password}
               />
-              {errors.password && touched.password && errors.password}
             </FieldContainer>
-            <Button
-              type="submit"
-              disabled={isSubmitting}
-              appearance="primary"
-              size="large"
-            >
-              Sign in{' '}
-            </Button>
-          </form>
+            <div>
+              <Button
+                type="submit"
+                disabled={isSubmitting}
+                appearance="primary"
+                size="large"
+              >
+                Sign in{' '}
+              </Button>
+            </div>
+          </Form>
         )}
       </Formik>
       <div className="my-4">

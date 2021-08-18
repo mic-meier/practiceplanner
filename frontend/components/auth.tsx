@@ -15,7 +15,7 @@ export type SignInResult =
 type AuthContextType =
   | {
       ready?: true
-      sessionData?: { id: string; name: string }
+      user?: { id: string; name: string }
       signIn: ({ email, password }: SignInArgs) => Promise<SignInResult>
       signOut: () => void
     }
@@ -42,10 +42,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   )
 
   const {
-    data: sessionData,
+    data: user,
     isLoading,
     error: sessionError,
-  } = useQuery('user', async () => {
+  } = useQuery('authenticatedUser', async () => {
     const data = await graphQLClient.request(
       gql`
         query {
@@ -85,7 +85,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     },
     {
       onSuccess: () => {
-        queryClient.invalidateQueries('user')
+        queryClient.invalidateQueries('authenticatedUser')
       },
     }
   )
@@ -125,7 +125,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     },
     {
       onSuccess: () => {
-        queryClient.invalidateQueries('user')
+        queryClient.invalidateQueries('authenticatedUser')
       },
     }
   )
@@ -143,8 +143,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   return (
     <AuthContext.Provider
       value={{
+        user: user?.authenticatedItem,
         ready: wasReady.current || !isLoading,
-        sessionData: sessionData?.authenticatedItem,
         signOut,
         signIn,
       }}

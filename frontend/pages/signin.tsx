@@ -5,8 +5,11 @@ import { Container } from '@frontend/components/ui/layout'
 import { Form, Formik } from 'formik'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
+import { SetStateAction, useState } from 'react'
 
 const SignInPage = () => {
+  const [signInError, setSignInError] =
+    useState<SetStateAction<null | string>>(null)
   const auth = useAuth()
   const router = useRouter()
 
@@ -18,7 +21,7 @@ const SignInPage = () => {
     console.log(result)
     if (result.success) {
       router.push('/')
-    }
+    } else setSignInError('No user with these credentials.')
   }
 
   return (
@@ -27,7 +30,6 @@ const SignInPage = () => {
       <Formik
         initialValues={{ email: '', password: '' }}
         onSubmit={(values, { setSubmitting }) => {
-          console.log(values)
           signIn(values)
           setSubmitting(false)
         }}
@@ -52,16 +54,17 @@ const SignInPage = () => {
                 id="password"
               />
             </FieldContainer>
-            <div>
-              <Button
-                type="submit"
-                disabled={isSubmitting}
-                appearance="primary"
-                size="large"
-              >
-                Sign in{' '}
-              </Button>
-            </div>
+            {signInError ? (
+              <div className="my-4 text-red-500 ">{signInError}</div>
+            ) : null}
+            <Button
+              type="submit"
+              disabled={isSubmitting}
+              appearance="primary"
+              size="large"
+            >
+              Sign in{' '}
+            </Button>
           </Form>
         )}
       </Formik>

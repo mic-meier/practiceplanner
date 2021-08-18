@@ -4,6 +4,7 @@ import { Container } from '@frontend/components/ui/layout'
 import { Form, Formik } from 'formik'
 import { gql, request } from 'graphql-request'
 import { useRouter } from 'next/router'
+import { SetStateAction, useState } from 'react'
 import { useMutation, useQueryClient } from 'react-query'
 import * as Yup from 'yup'
 
@@ -25,37 +26,53 @@ const SignupSchema = Yup.object().shape({
     .required('Password is required'),
 })
 
+const signUpRequest = async ({ name, email, password }: SignUpArgs) => {
+  const endpoint =
+    typeof window === undefined
+      ? 'http://localhost:8001/api/graphql'
+      : '/api/graphql'
+
+  const query = gql`
+    mutation ($name: String!, $email: String!, $password: String!) {
+      createUser(data: { name: $name, email: $email, password: $password }) {
+        __typename
+        id
+      }
+      authenticateUserWithPassword(email: $email, password: $password) {
+        __typename
+      }
+    }
+  `
+
+  try {
+    const data = await request(endpoint, query, { name, email, password })
+    console.log(data)
+    return data
+  } catch (error) {
+    console.log(error.response.errors[0].message)
+    return Promise.reject('Email already taken')
+  }
+}
+
 const SignupPage = () => {
   const queryClient = useQueryClient()
   const router = useRouter()
+  const [signupError, setSignupError] =
+    useState<SetStateAction<null | string>>(null)
 
   const { mutateAsync: signup } = useMutation(
-    async ({ name, email, password }: SignUpArgs) => {
-      const data = await request(
-        typeof window === undefined
-          ? 'http://localhost:8001/api/graphql'
-          : '/api/graphql',
-        gql`
-          mutation ($name: String!, $email: String!, $password: String!) {
-            createUser(
-              data: { name: $name, email: $email, password: $password }
-            ) {
-              __typename
-              id
-            }
-            authenticateUserWithPassword(email: $email, password: $password) {
-              __typename
-            }
-          }
-        `,
-        { name, email, password }
-      )
-      return data
-    },
+    ({ name, email, password }: SignUpArgs) =>
+      signUpRequest({ name, email, password }),
     {
       onSuccess: () => {
-        queryClient.invalidateQueries('user')
+        queryClient.invalidateQueries('authenticatedUser')
         router.push('/')
+      },
+      onError: (error: string) => {
+        setSignupError(error)
+        setTimeout(() => {
+          setSignupError(null)
+        }, 2000)
       },
     }
   )
@@ -100,12 +117,13 @@ const SignupPage = () => {
                 id="password"
               />
             </FieldContainer>
-
+            {signupError ? <div>{signupError}</div> : null}
             <Button
               type="submit"
               disabled={isSubmitting}
               appearance="primary"
               size="large"
+              // onClick={handleReset}
             >
               Join{' '}
             </Button>

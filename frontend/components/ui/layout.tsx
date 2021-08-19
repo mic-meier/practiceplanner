@@ -1,9 +1,9 @@
 import { ReactNode } from 'react'
 
-export function Container({ children }: { children: ReactNode }) {
+export function FormContainer({ children }: { children: ReactNode }) {
   return (
-    <div className="min-h-screen bg-gray-100">
-      <div className="container mx-auto p-6 bg-white min-h-screen border-l border-r">
+    <div className="flex items-center min-h-screen p-20 bg-gray-100">
+      <div className="mx-auto my-auto py-10 px-16 bg-white rounded-lg shadow-xl">
         {children}
       </div>
     </div>

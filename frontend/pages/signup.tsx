@@ -1,6 +1,6 @@
 import { Button } from '@frontend/components/ui/controls'
 import { FieldContainer, TextInput } from '@frontend/components/ui/forms'
-import { Container } from '@frontend/components/ui/layout'
+import { FormContainer } from '@frontend/components/ui/layout'
 import { Form, Formik } from 'formik'
 import { gql, request } from 'graphql-request'
 import { useRouter } from 'next/router'
@@ -78,59 +78,61 @@ const SignupPage = () => {
   )
 
   return (
-    <Container>
-      <h1>Sign Up</h1>
-      <Formik
-        initialValues={{ name: '', email: '', password: '' }}
-        validationSchema={SignupSchema}
-        onSubmit={(values, { setSubmitting }) => {
-          setSubmitting(false)
-          signup(values)
-        }}
-      >
-        {({ isSubmitting }) => (
-          <Form>
-            <FieldContainer>
-              <TextInput
+    <FormContainer>
+      <h1 className="text-2xl font-semibold">Sign Up</h1>
+      <div className="pt-4">
+        <Formik
+          initialValues={{ name: '', email: '', password: '' }}
+          validationSchema={SignupSchema}
+          onSubmit={(values, { setSubmitting }) => {
+            setSubmitting(false)
+            signup(values)
+          }}
+        >
+          {({ isSubmitting }) => (
+            <Form>
+              <FieldContainer>
+                <TextInput
+                  size="large"
+                  label="Name"
+                  type="text"
+                  name="name"
+                  id="name"
+                />
+              </FieldContainer>
+              <FieldContainer>
+                <TextInput
+                  size="large"
+                  label="Email"
+                  type="email"
+                  name="email"
+                  id="email"
+                />
+              </FieldContainer>
+              <FieldContainer>
+                <TextInput
+                  size="large"
+                  label="Password"
+                  type="password"
+                  name="password"
+                  id="password"
+                />
+              </FieldContainer>
+              {signupError ? <div>{signupError}</div> : null}
+              <Button
+                type="submit"
+                disabled={isSubmitting}
+                appearance="primary"
                 size="large"
-                label="Name"
-                type="text"
-                name="name"
-                id="name"
-              />
-            </FieldContainer>
-            <FieldContainer>
-              <TextInput
-                size="large"
-                label="Email"
-                type="email"
-                name="email"
-                id="email"
-              />
-            </FieldContainer>
-            <FieldContainer>
-              <TextInput
-                size="large"
-                label="Password"
-                type="password"
-                name="password"
-                id="password"
-              />
-            </FieldContainer>
-            {signupError ? <div>{signupError}</div> : null}
-            <Button
-              type="submit"
-              disabled={isSubmitting}
-              appearance="primary"
-              size="large"
-              // onClick={handleReset}
-            >
-              Join{' '}
-            </Button>
-          </Form>
-        )}
-      </Formik>
-    </Container>
+                // onClick={handleReset}
+              >
+                Join{' '}
+              </Button>
+            </Form>
+          )}
+        </Formik>
+      </div>
+    </FormContainer>
   )
 }
 

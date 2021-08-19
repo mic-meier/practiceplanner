@@ -9,12 +9,14 @@ generator client {
 }
 
 model User {
-  id       String  @id @default(cuid())
-  name     String?
-  email    String? @unique
-  password String?
-  role     Role?   @relation("User_role", fields: [roleId], references: [id])
-  roleId   String? @map("role")
+  id        String     @id @default(cuid())
+  name      String?
+  email     String?    @unique
+  password  String?
+  role      Role?      @relation("User_role", fields: [roleId], references: [id])
+  roleId    String?    @map("role")
+  exercises Exercise[] @relation("Exercise_user")
+  routines  Routine[]  @relation("Routine_user")
 
   @@index([roleId])
 }
@@ -25,4 +27,41 @@ model Role {
   canManageContent Boolean?
   canManageUsers   Boolean?
   users            User[]   @relation("User_role")
+}
+
+model Routine {
+  id          String     @id @default(cuid())
+  name        String?
+  description String?
+  notes       String?
+  createdAt   DateTime?
+  updatedAt   DateTime?
+  user        User?      @relation("Routine_user", fields: [userId], references: [id])
+  userId      String?    @map("user")
+  exercises   Exercise[] @relation("Exercise_routines_Routine_exercises")
+
+  @@index([userId])
+}
+
+model Exercise {
+  id          String                @id @default(cuid())
+  name        String?               @unique
+  description String?
+  category    ExerciseCategoryType?
+  duration    Int?
+  notes       String?
+  createdAt   DateTime?
+  updatedAt   DateTime?
+  user        User?                 @relation("Exercise_user", fields: [userId], references: [id])
+  userId      String?               @map("user")
+  routines    Routine[]             @relation("Exercise_routines_Routine_exercises")
+
+  @@index([userId])
+}
+
+enum ExerciseCategoryType {
+  technique
+  theory
+  earTraining
+  repertoire
 }

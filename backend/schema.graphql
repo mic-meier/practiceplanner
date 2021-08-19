@@ -24,6 +24,24 @@ type Mutation {
   updateRoles(data: [RoleUpdateArgs!]!): [Role]
   deleteRole(where: RoleWhereUniqueInput!): Role
   deleteRoles(where: [RoleWhereUniqueInput!]!): [Role]
+  createRoutine(data: RoutineCreateInput!): Routine
+  createRoutines(data: [RoutineCreateInput!]!): [Routine]
+  updateRoutine(
+    where: RoutineWhereUniqueInput!
+    data: RoutineUpdateInput!
+  ): Routine
+  updateRoutines(data: [RoutineUpdateArgs!]!): [Routine]
+  deleteRoutine(where: RoutineWhereUniqueInput!): Routine
+  deleteRoutines(where: [RoutineWhereUniqueInput!]!): [Routine]
+  createExercise(data: ExerciseCreateInput!): Exercise
+  createExercises(data: [ExerciseCreateInput!]!): [Exercise]
+  updateExercise(
+    where: ExerciseWhereUniqueInput!
+    data: ExerciseUpdateInput!
+  ): Exercise
+  updateExercises(data: [ExerciseUpdateArgs!]!): [Exercise]
+  deleteExercise(where: ExerciseWhereUniqueInput!): Exercise
+  deleteExercises(where: [ExerciseWhereUniqueInput!]!): [Exercise]
   endSession: Boolean!
 }
 
@@ -57,6 +75,20 @@ type User {
   email: String
   password: PasswordState
   role: Role
+  exercises(
+    where: ExerciseWhereInput! = {}
+    orderBy: [ExerciseOrderByInput!]! = []
+    take: Int
+    skip: Int! = 0
+  ): [Exercise!]
+  exercisesCount(where: ExerciseWhereInput! = {}): Int
+  routines(
+    where: RoutineWhereInput! = {}
+    orderBy: [RoutineOrderByInput!]! = []
+    take: Int
+    skip: Int! = 0
+  ): [Routine!]
+  routinesCount(where: RoutineWhereInput! = {}): Int
 }
 
 type PasswordState {
@@ -72,6 +104,8 @@ input UserWhereInput {
   email: StringNullableFilter
   password: PasswordFilter
   role: RoleWhereInput
+  exercises: ExerciseManyRelationFilter
+  routines: RoutineManyRelationFilter
 }
 
 input IDFilter {
@@ -123,6 +157,18 @@ input PasswordFilter {
   isSet: Boolean!
 }
 
+input ExerciseManyRelationFilter {
+  every: ExerciseWhereInput
+  some: ExerciseWhereInput
+  none: ExerciseWhereInput
+}
+
+input RoutineManyRelationFilter {
+  every: RoutineWhereInput
+  some: RoutineWhereInput
+  none: RoutineWhereInput
+}
+
 input UserWhereUniqueInput {
   id: ID
   email: String
@@ -144,12 +190,28 @@ input UserUpdateInput {
   email: String
   password: String
   role: RoleRelateToOneForUpdateInput
+  exercises: ExerciseRelateToManyForUpdateInput
+  routines: RoutineRelateToManyForUpdateInput
 }
 
 input RoleRelateToOneForUpdateInput {
   create: RoleCreateInput
   connect: RoleWhereUniqueInput
   disconnect: Boolean
+}
+
+input ExerciseRelateToManyForUpdateInput {
+  disconnect: [ExerciseWhereUniqueInput!]
+  set: [ExerciseWhereUniqueInput!]
+  create: [ExerciseCreateInput!]
+  connect: [ExerciseWhereUniqueInput!]
+}
+
+input RoutineRelateToManyForUpdateInput {
+  disconnect: [RoutineWhereUniqueInput!]
+  set: [RoutineWhereUniqueInput!]
+  create: [RoutineCreateInput!]
+  connect: [RoutineWhereUniqueInput!]
 }
 
 input UserUpdateArgs {
@@ -162,11 +224,23 @@ input UserCreateInput {
   email: String
   password: String
   role: RoleRelateToOneForCreateInput
+  exercises: ExerciseRelateToManyForCreateInput
+  routines: RoutineRelateToManyForCreateInput
 }
 
 input RoleRelateToOneForCreateInput {
   create: RoleCreateInput
   connect: RoleWhereUniqueInput
+}
+
+input ExerciseRelateToManyForCreateInput {
+  create: [ExerciseCreateInput!]
+  connect: [ExerciseWhereUniqueInput!]
+}
+
+input RoutineRelateToManyForCreateInput {
+  create: [RoutineCreateInput!]
+  connect: [RoutineWhereUniqueInput!]
 }
 
 type Role {
@@ -247,6 +321,202 @@ input UserRelateToManyForCreateInput {
   connect: [UserWhereUniqueInput!]
 }
 
+type Routine {
+  id: ID!
+  name: String
+  description: String
+  notes: String
+  createdAt: String
+  updatedAt: String
+  user: User
+  exercises(
+    where: ExerciseWhereInput! = {}
+    orderBy: [ExerciseOrderByInput!]! = []
+    take: Int
+    skip: Int! = 0
+  ): [Exercise!]
+  exercisesCount(where: ExerciseWhereInput! = {}): Int
+}
+
+input RoutineWhereInput {
+  AND: [RoutineWhereInput!]
+  OR: [RoutineWhereInput!]
+  NOT: [RoutineWhereInput!]
+  id: IDFilter
+  name: StringNullableFilter
+  description: StringNullableFilter
+  notes: StringNullableFilter
+  createdAt: DateTimeNullableFilter
+  updatedAt: DateTimeNullableFilter
+  user: UserWhereInput
+  exercises: ExerciseManyRelationFilter
+}
+
+input DateTimeNullableFilter {
+  equals: String
+  in: [String!]
+  notIn: [String!]
+  lt: String
+  lte: String
+  gt: String
+  gte: String
+  not: DateTimeNullableFilter
+}
+
+input RoutineWhereUniqueInput {
+  id: ID
+}
+
+input RoutineOrderByInput {
+  id: OrderDirection
+  name: OrderDirection
+  description: OrderDirection
+  notes: OrderDirection
+  createdAt: OrderDirection
+  updatedAt: OrderDirection
+}
+
+input RoutineUpdateInput {
+  name: String
+  description: String
+  notes: String
+  createdAt: String
+  updatedAt: String
+  user: UserRelateToOneForUpdateInput
+  exercises: ExerciseRelateToManyForUpdateInput
+}
+
+input UserRelateToOneForUpdateInput {
+  create: UserCreateInput
+  connect: UserWhereUniqueInput
+  disconnect: Boolean
+}
+
+input RoutineUpdateArgs {
+  where: RoutineWhereUniqueInput!
+  data: RoutineUpdateInput!
+}
+
+input RoutineCreateInput {
+  name: String
+  description: String
+  notes: String
+  createdAt: String
+  updatedAt: String
+  user: UserRelateToOneForCreateInput
+  exercises: ExerciseRelateToManyForCreateInput
+}
+
+input UserRelateToOneForCreateInput {
+  create: UserCreateInput
+  connect: UserWhereUniqueInput
+}
+
+type Exercise {
+  id: ID!
+  name: String
+  description: String
+  category: ExerciseCategoryType
+  duration: Int
+  notes: String
+  createdAt: String
+  updatedAt: String
+  user: User
+  routines(
+    where: RoutineWhereInput! = {}
+    orderBy: [RoutineOrderByInput!]! = []
+    take: Int
+    skip: Int! = 0
+  ): [Routine!]
+  routinesCount(where: RoutineWhereInput! = {}): Int
+}
+
+enum ExerciseCategoryType {
+  technique
+  theory
+  earTraining
+  repertoire
+}
+
+input ExerciseWhereInput {
+  AND: [ExerciseWhereInput!]
+  OR: [ExerciseWhereInput!]
+  NOT: [ExerciseWhereInput!]
+  id: IDFilter
+  name: StringNullableFilter
+  description: StringNullableFilter
+  category: ExerciseCategoryTypeNullableFilter
+  duration: IntNullableFilter
+  notes: StringNullableFilter
+  createdAt: DateTimeNullableFilter
+  updatedAt: DateTimeNullableFilter
+  user: UserWhereInput
+  routines: RoutineManyRelationFilter
+}
+
+input ExerciseCategoryTypeNullableFilter {
+  equals: ExerciseCategoryType
+  in: [ExerciseCategoryType!]
+  notIn: [ExerciseCategoryType!]
+  not: ExerciseCategoryTypeNullableFilter
+}
+
+input IntNullableFilter {
+  equals: Int
+  in: [Int!]
+  notIn: [Int!]
+  lt: Int
+  lte: Int
+  gt: Int
+  gte: Int
+  not: IntNullableFilter
+}
+
+input ExerciseWhereUniqueInput {
+  id: ID
+  name: String
+}
+
+input ExerciseOrderByInput {
+  id: OrderDirection
+  name: OrderDirection
+  description: OrderDirection
+  category: OrderDirection
+  duration: OrderDirection
+  notes: OrderDirection
+  createdAt: OrderDirection
+  updatedAt: OrderDirection
+}
+
+input ExerciseUpdateInput {
+  name: String
+  description: String
+  category: ExerciseCategoryType
+  duration: Int
+  notes: String
+  createdAt: String
+  updatedAt: String
+  user: UserRelateToOneForUpdateInput
+  routines: RoutineRelateToManyForUpdateInput
+}
+
+input ExerciseUpdateArgs {
+  where: ExerciseWhereUniqueInput!
+  data: ExerciseUpdateInput!
+}
+
+input ExerciseCreateInput {
+  name: String
+  description: String
+  category: ExerciseCategoryType
+  duration: Int
+  notes: String
+  createdAt: String
+  updatedAt: String
+  user: UserRelateToOneForCreateInput
+  routines: RoutineRelateToManyForCreateInput
+}
+
 """
 The `JSON` scalar type represents JSON values as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
 """
@@ -273,6 +543,22 @@ type Query {
   ): [Role!]
   role(where: RoleWhereUniqueInput!): Role
   rolesCount(where: RoleWhereInput! = {}): Int
+  routines(
+    where: RoutineWhereInput! = {}
+    orderBy: [RoutineOrderByInput!]! = []
+    take: Int
+    skip: Int! = 0
+  ): [Routine!]
+  routine(where: RoutineWhereUniqueInput!): Routine
+  routinesCount(where: RoutineWhereInput! = {}): Int
+  exercises(
+    where: ExerciseWhereInput! = {}
+    orderBy: [ExerciseOrderByInput!]! = []
+    take: Int
+    skip: Int! = 0
+  ): [Exercise!]
+  exercise(where: ExerciseWhereUniqueInput!): Exercise
+  exercisesCount(where: ExerciseWhereInput! = {}): Int
   keystone: KeystoneMeta!
 }
 

@@ -7,6 +7,20 @@ export const User = list({
     email: text({ isUnique: true }),
     password: password(),
     role: relationship({ ref: 'Role.users' }),
+    exercises: relationship({
+      ref: 'Exercise.user',
+      many: true,
+      ui: {
+        displayMode: 'select',
+      },
+    }),
+    routines: relationship({
+      ref: 'Routine.user',
+      many: true,
+      ui: {
+        displayMode: 'select',
+      },
+    }),
   },
 })
 

@@ -1,4 +1,7 @@
-import { gql, GraphQLClient } from 'graphql-request'
+import { useAuthenticatedUser } from '@frontend/hooks/useAuthenticatedUser'
+import { graphQLClient } from '@frontend/lib/graphQLClient'
+import { gql } from 'graphql-request'
+import router from 'next/router'
 import { createContext, ReactNode, useContext, useEffect, useRef } from 'react'
 import { useMutation, useQuery, useQueryClient } from 'react-query'
 
@@ -35,31 +38,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const queryClient = useQueryClient()
   const wasReady = useRef(false)
 
-  const graphQLClient = new GraphQLClient(
-    typeof window === undefined
-      ? 'http://localhost:8001/api/graphql'
-      : '/api/graphql'
-  )
-
-  const {
-    data: user,
-    isLoading,
-    error: sessionError,
-  } = useQuery('authenticatedUser', async () => {
-    const data = await graphQLClient.request(
-      gql`
-        query {
-          authenticatedItem {
-            ... on User {
-              id
-              name
-            }
-          }
-        }
-      `
-    )
-    return data
-  })
+  const { data: user, isLoading, error: sessionError } = useAuthenticatedUser()
 
   const { mutateAsync: authenticate } = useMutation(
     async ({ email, password }: SignInArgs) => {
@@ -132,6 +111,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const signOut = () => {
     signOutMutation()
+    router.push('/')
   }
 
   useEffect(() => {

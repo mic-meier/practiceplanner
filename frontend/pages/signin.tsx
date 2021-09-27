@@ -18,9 +18,8 @@ const SignInPage = () => {
       return <div>Loading...</div>
     }
     const result = await auth.signIn({ email, password })
-    console.log(result)
     if (result.success) {
-      router.push('/')
+      router.push('/profile')
     } else setSignInError('No user with these credentials.')
   }
 
